@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Tetris</title>
+  <!-- <script type="text/javascript" src="Tetris.js"></script> -->
+  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <!-- <script src="jquery.pause.js"></script> -->
+  <link rel="stylesheet" href="Tetris.css">
+
+</head>
+
+<body>
+  <!-- <div id="start">
+    <button id="start_button" type="button" onclick="start()">START</button>
+  </div> -->
+  <!-- <canvas id="myCanvas"></canvas> -->
+  <script>
+
+    // var canvas = document.getElementById("myCanvas").getContext("2d");
+
+    //
+    // 前準備。
+    //
+    var i;
+    const width = 350;
+    const height = 600;
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    document.body.appendChild(canvas);
+    canvas.width = width;
+    canvas.height = height;
+
+    var mino = [({ x1: 1, y1: 1, x2: 2, y2: 1, x3: 2, y3: 4, x4: 1, y4: 4 })];
+    var mino_place = [];
+    var terrain_top = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    var terrain_data = Array(220);
+    add_mino();
+    function add_mino() {
+      mino_place.push({ x: 100, y: 0, w: 20, h: 40 });//下
+      mino_place.push({ x: 100, y: 40, w: 20, h: 40 });//上
+      loop();
+    }
+
+    // circles.push({ x1: 1, y1: 1, x2: 2, y2: 1, x3: 2, y3: 4, x4: 1, y4: 4, });
+
+    function loop() {
+      context.clearRect(0, 0, width, height);
+      background();
+
+      context.beginPath();
+      context.fillStyle = 'rgb(0, 0, 0)';
+
+      context.fill();
+      for (const mp of mino_place) {
+        context.fillRect(mp.x, mp.y, mp.w, mp.h)
+      }
+
+      if (mino_place[0].y < 460) {
+        mino_place[0].y += 1;
+        mino_place[1].y += 1;
+        window.requestAnimationFrame(loop);
+      }
+      else {
+        // for (i = 0; i < (mino_place[0].w); i++) { }
+
+        terrain_top[((mino_place[0].x) - 80) / 20] += mino_place[0].h / 20;
+        terrain_top[((mino_place[1].x) - 80) / 20] += mino_place[1].h / 20;
+        // console.log(terrain_top);
+        // console.log(mino_place[0]);
+        // console.log(mino_place[1]);
+        mino_place.pop();
+        mino_place.pop();
+        // add_mino();
+      }
+
+    }
+
+
+    document.addEventListener('keydown', function (e) {
+      if (e.code == 'ArrowLeft' && mino_place[0].x > 80 && mino_place[1].x > 80) {
+        for (const mp of mino_place) {
+          mp.x -= 20;
+        }
+      } else if (e.code == 'ArrowRight' && mino_place[0].x < 240 && mino_place[1].x < 240) {
+        for (const mp of mino_place) {
+          mp.x += 20;
+        }
+      }
+      // document.querySelector(`#output`).textContent = output;
+
+    })
+
+    function background() {
+      let i;
+      for (i = 0; i <= 10; i++) {
+        context.moveTo(80 + i * 20, 100);
+        context.lineTo(80 + i * 20, 540);
+      }
+      for (i = 0; i < 22; i++) {
+        context.moveTo(80, 100 + i * 20);
+        context.lineTo(280, 100 + i * 20);
+      }
+      context.strokeStyle = "rgba(0,0,0,0.3)";
+      context.lineWidth = 1;
+      context.stroke();
+      context.beginPath();
+      context.rect(80, 100, 200, 440)
+      context.strokeStyle = "rgba(0,0,0,1)";
+      context.lineWidth = 2;
+      context.stroke();
+    }
+  </script>
+  <div>
+    <p>左上:80,100<br>
+      右上:280,100<br>
+      左下:280,540<br>
+      右下:80,540<br>
+      幅:20<br>
+      1:I字-水色<br>
+      2:O字-黄色<br>
+      3:L字-オレンジ<br>
+      4:逆L字-青<br>
+      5:緑<br>
+      6:赤<br>
+
+    </p>
+  </div>
+</body>
+
+</html>
