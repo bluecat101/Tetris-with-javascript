@@ -1,6 +1,17 @@
-<!-- 回転方法として右回転を+1,左回転を-1としてリストを作り、さらにそこからkindsを考え、端であるかを考慮することでスッキリする。
-また、回転w確認する関数(配列を受け取る)を作る。ここで各kindsの中心からの回転によりかぶさる位置を渡す。
-確認をするのではなく、失敗したら基に戻すようにする。-->
+<!-- 詳細 -->
+<!-- 左上:80,100<br>
+      右上:280,100<br>
+      左下:280,540<br>
+      右下:80,540<br>
+      幅:20<br>
+      1:I字-水色<br>
+      2:O字-黄色<br>
+      3:L字-オレンジ<br>
+      4:逆L字-青<br>
+      5:緑<br>
+      6:赤<br>
+      7:T字-紫<br>
+      8:外部<br> -->
 
 
 
@@ -12,8 +23,8 @@
   <title>Tetris</title>
   <!-- <script type="text/javascript" src="Tetris.js"></script> -->
   <script src="https:
-  <!-- <script src=" jquery.pause.js"></script> -->
-  <link rel="stylesheet" href="Tetris.css">
+  <!-- <script src=" jquery.pause.js "></script>
+  <link rel=" stylesheet" href="Tetris.css">
 
 </head>
 
@@ -23,13 +34,6 @@
   </div> -->
   <!-- <canvas id="myCanvas"></canvas> -->
   <script>
-
-
-
-
-
-
-
     var i;
     var bgy = 0;
     const width = 350;
@@ -41,27 +45,20 @@
     canvas.height = height;
 
 
-
     var mino_place = [];
     var terrain_data = Array(288);
     terrain_data_length = terrain_data.length - 12;
     terrain_data.fill(0);
-    terrain_data[220] = 3;
-    terrain_data[219] = 3;
-    for (i = 0; i < 288; i++) {
+    for (i = 0; i < 288; i++) {//create terrain
       if (i < 12 || i % 12 == 0 || i % 12 == 11 || i > 276) {
         terrain_data[i] = 8;
       }
     }
-
-    var flag_down = 0;
-    var check_row_number = 0;
-    // var rotate_number = 0;
     make_mino();
     loop();
 
 
-
+    //main function
     function loop() {
       context.clearRect(0, 0, width, height);
       background();
@@ -69,26 +66,21 @@
         terrain_data[mp.position] = mp.kinds;
       }
       display();
-      bgy += 1;
+      bgy += 1;//decreased drawing speed
       if (bgy > 33) {
         bgy = 0;
-        if (check_flag_down() == 0) {
+        if (check_flag_down() == 0) {//shift 1 row
           for (const mp of mino_place) {
             terrain_data[mp.position] = 0
             mp.position += 12;
           }
         } else {
-
           check_row();
           make_mino();
         }
       }
-
-      window.requestAnimationFrame(loop);
+      window.requestAnimationFrame(loop);//loop
     }
-
-
-
 
 
     document.addEventListener('keydown', function (e) {
@@ -104,17 +96,26 @@
         }
       } else if (e.code == 'KeyA') {
         if (mino_place[0].kinds == 1) {
-          check_rotate_right("form_I", "left");
+          rotate_right("form_I", "left");
         } else if (mino_place[0].kinds != 2) {
-          check_rotate_right("no_I", "left");
+          rotate_right("no_I", "left");
         }
-
-
       } else if (e.code == 'KeyD') {
         if (mino_place[0].kinds == 1) {
-          check_rotate_right("form_I", "right");
+          rotate_right("form_I", "right");
         } else if (mino_place[0].kinds != 2) {
-          check_rotate_right("no_I", "right");
+          rotate_right("no_I", "right");
+        }
+      }
+      else if (e.code == 'ArrowDown') {
+        bgy += 30
+      }
+      else if (e.code == 'Space') {
+        while (check_flag_down() == 0) {
+          for (var mp of mino_place) {
+            terrain_data[mp.position] = 0
+            mp.position += 12;
+          }
         }
       }
     })
@@ -149,9 +150,7 @@
 
     function make_mino() {
       mino_place.splice(0);
-      // var rand = Math.floor(Math.random() * 7) + 1
-      // var rand = Math.floor(Math.random() * 4) + 3
-      var rand = 1;
+      var rand = Math.floor(Math.random() * 7) + 1
       switch (rand) {
         case 1:
           mino_place.push({ kinds: 1, position: 5 });
@@ -199,8 +198,7 @@
       }
     }
 
-    function check_rotate_right(condition, dilection) {
-      console.log(condition);
+    function rotate_right(condition, dilection) {
       var shift_flag = 0;
       var deplucate_mino_place = [];
       for (i = 0; i < 4; i++) {
@@ -222,8 +220,6 @@
               case 1:
                 deplucate_mino_place[index] += 1 / (dmp - deplucate_mino_place[0]) * (-13);
                 break;
-              default:
-                break;
             }
           } else if (dilection == "right") {
             switch (Math.abs(dmp - deplucate_mino_place[0])) {
@@ -239,8 +235,6 @@
               case 1:
                 deplucate_mino_place[index] += 1 / (dmp - deplucate_mino_place[0]) * 11;
                 break;
-              default:
-                break;
             }
 
           }
@@ -248,13 +242,10 @@
         });
 
       } else if (condition == "form_I") {
-
         var rotation_number = get_number_rotation();
-        console.log("rotation_number", rotation_number);
-        console.log("deplucate_mino_place[0]", deplucate_mino_place[0]);
         if (dilection == "left") {
           switch (rotation_number) {
-            case 0://rotation_number =>-1
+            case 0:
               deplucate_mino_place[0] += 12;
               break;
             case 1:
@@ -286,7 +277,6 @@
           }
           rotation_number += 1;
         }
-        console.log(deplucate_mino_place);
         if (rotation_number == -1) {
           rotation_number = 3;
         } else if (rotation_number == 4) {
@@ -315,20 +305,6 @@
             deplucate_mino_place[3] = deplucate_mino_place[0] - 24;
             break;
         }
-        console.log("before", deplucate_mino_place);
-        // if (rotation_number == 0 || rotation_number == 2) && (Math.floor(deplucate_mino_place[0] / 12) != Math.floor(deplucate_mino_place[3] / 12) ) {
-        //   // if ((rotation_number == 0 || rotation_number == 2) && (deplucate_mino_place[0] % 12 == 0 || deplucate_mino_place[0] % 12 == 11)) {
-
-        //   if (deplucate_mino_place[0] < deplucate_mino_place[3] || deplucate_mino_place[0] < deplucate_mino_place[1]) {
-        //     console.log("0ずれ");
-        //     shift_flag = -2;
-        //   } else if (deplucate_mino_place[0] > deplucate_mino_place[3] || deplucate_mino_place[0] > deplucate_mino_place[1]) {
-        //     console.log("2ずれ");
-        //     shift_flag = 2;
-
-        //   }
-        // }
-
         if (rotation_number == 0) {
 
           switch (deplucate_mino_place[0] % 12) {
@@ -368,7 +344,6 @@
         deplucate_mino_place[i] += shift_flag;
 
       };
-      console.log(deplucate_mino_place);
 
 
       //^^^複製上で移動を行う
@@ -377,44 +352,16 @@
       deplucate_mino_place.forEach(function (dmp) {
         if (terrain_data[dmp] != 0 && (dmp != mino_place[0].position && dmp != mino_place[1].position && dmp != mino_place[2].position && dmp != mino_place[3].position)) {
           //元に戻す
-          // console.log(dmp);
-          // console.log("terrain_data[dmp]", terrain_data[dmp]);
           undo = 1;
         }
       });
       if (undo == 0) {
-        console.log("複製を正規として扱う");
         for (i = 0; i < 4; i++) {
           terrain_data[mino_place[i].position] = 0
           mino_place[i].position = deplucate_mino_place[i];
         }
       } else {
-        console.log("undo");
       }
-    }
-
-    function check_row() {
-      for (var i = 1; i < terrain_data_length / 10; i++) {
-        check_row_number = 0;
-        for (var j = 0; j < 10; j++) {
-          if (terrain_data[i * 10 + j] != 0) {
-            check_row_number += 1;
-          }
-        }
-        if (check_row_number == 10) {
-          for (var j = 0; j < 10; j++) {
-            terrain_data[i * 10 + j] = 0;
-          }
-          shift(i);
-        }
-      }
-    }
-
-    function shift(shift_row) {
-      for (var j = shift_row * 10 - 1; j >= 0; j--) {
-        terrain_data[j + 10] = terrain_data[j];
-      }
-
     }
 
     function get_number_rotation() {
@@ -433,6 +380,32 @@
           break;
       }
     }
+
+    function check_row() {
+      var check_row_number = 0;
+      for (var i = 1; i < terrain_data_length / 12; i++) {
+        for (var j = 0; j < 12; j++) {
+          if (terrain_data[i * 12 + j] != 0) {
+            check_row_number += 1;
+          }
+        }
+        if (check_row_number == 12) {
+          for (var j = 0; j < 12; j++) {
+            terrain_data[i * 12 + j] = 0;
+          }
+          shift(i);
+        }
+      }
+    }
+
+    function shift(shift_row) {
+      for (var j = shift_row * 12 - 1; j >= 0; j--) {
+        terrain_data[j + 12] = terrain_data[j];
+      }
+
+    }
+
+
 
 
     function display() {
@@ -496,25 +469,9 @@
       context.stroke();
     }
   </script>
-  <div>
-    <p>
 
-      左上:80,100<br>
-      右上:280,100<br>
-      左下:280,540<br>
-      右下:80,540<br>
-      幅:20<br>
-      1:I字-水色<br>
-      2:O字-黄色<br>
-      3:L字-オレンジ<br>
-      4:逆L字-青<br>
-      5:緑<br>
-      6:赤<br>
-      7:T字-紫<br>
-      8:外部<br>
-    </p>
-  </div>
-</body>
+
+  </body>
 
 </html>
 ;
